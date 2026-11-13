@@ -352,6 +352,57 @@ class AppLocalizationsAm extends AppLocalizations {
   String get femaleWear => 'የሴቶች ልብሶች';
 
   @override
+  String get back => 'ተመለስ';
+
+  @override
+  String get next => 'ቀጣይ';
+
+  @override
+  String get viewMeasurements => 'መጠኖችን ተመልከት';
+
+  @override
+  String get orderSummary => 'የትእዛዝ ግምገማ';
+
+  @override
+  String get customerInfo => 'የደንበኛ መረጃ';
+
+  @override
+  String get statusTimeline => 'የትእዛዝ ሁኔታ ተከታታይ';
+
+  @override
+  String get updateStatus => 'ሁኔታ አዘምን';
+
+  @override
+  String get viewAll => 'ሁሉንም ይመልከት';
+
+  @override
+  String get statTotalOrders => 'ጠቅላላ ትእዛዞች';
+
+  @override
+  String get statCustomers => 'ደንበኞች';
+
+  @override
+  String get statCompleted => 'የተጠናቀቁ';
+
+  @override
+  String get tagline => 'የልብስ ስፌት አስተዳደር ስርዓት';
+
+  @override
+  String get thankYou => 'ዚዚ ፋሽንን ስለመረጡን እናመሰግናለን';
+
+  @override
+  String get goHome => 'ወደ መነሻ ተመለስ';
+
+  @override
+  String get orderSuccessTitle => 'ትእዛዝ በተሳካ ሁኔታ ተመዝግቧል!';
+
+  @override
+  String get recentOrders => 'የቅርብ ትእዛዞች';
+
+  @override
+  String get registered => 'የተመዘገበበት';
+
+  @override
   String get fieldGender => 'ጾታ';
 
   @override

@@ -12,8 +12,10 @@ import '../state/shop_provider.dart';
 import '../util/date_display.dart';
 import '../util/ethiopian_calendar.dart';
 import '../util/format.dart';
+import '../util/zizi_colors.dart';
 import '../widgets/garment_form.dart';
 import 'common.dart';
+import 'order_success_screen.dart';
 
 class _WizardItem {
   _WizardItem(this.def, this.quantity);
@@ -181,63 +183,73 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
     final labels = _stepLabels(l10n);
     return Container(
       color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 14),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (var i = 0; i < labels.length; i++)
-              Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: i < _step
-                      ? () => setState(() => _step = i)
-                      : null,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+            for (var i = 0; i < labels.length; i++) ...[
+              Column(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
                     decoration: BoxDecoration(
-                      color: i == _step
-                          ? Theme.of(context).colorScheme.primary
-                          : i < _step
-                              ? Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(999),
+                      color: i <= _step
+                          ? ZiziColors.purple
+                          : Colors.white,
+                      border: Border.all(
+                        color: i <= _step
+                            ? ZiziColors.purple
+                            : ZiziColors.cardBorder,
+                        width: 2,
+                      ),
+                      shape: BoxShape.circle,
                     ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          i < _step ? Icons.check_circle : Icons.trip_origin,
-                          size: 14,
-                          color: i == _step
-                              ? Colors.white
-                              : Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          labels[i],
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: i == _step
-                                ? FontWeight.w700
-                                : FontWeight.w500,
-                            color: i == _step
-                                ? Colors.white
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                          ),
-                        ),
-                      ],
+                    child: Center(
+                      child: i < _step
+                          ? const Icon(Icons.check,
+                              size: 18, color: Colors.white)
+                          : Text(
+                              '${i + 1}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: i == _step
+                                    ? Colors.white
+                                    : ZiziColors.ink,
+                              ),
+                            ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    labels[i],
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: i == _step
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: i == _step
+                          ? ZiziColors.purple
+                          : ZiziColors.ink
+                              .withOpacity(0.55),
+                    ),
+                  ),
+                ],
               ),
+              if (i < labels.length - 1)
+                Container(
+                  width: 26,
+                  height: 2,
+                  margin: const EdgeInsets.only(top: 16),
+                  color: i < _step
+                      ? ZiziColors.purple
+                      : ZiziColors.cardBorder,
+                ),
+            ],
           ],
         ),
       ),
@@ -602,7 +614,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
                   ? null
                   : () => setState(() => _itemTab = _itemTab - 1),
               icon: const Icon(Icons.arrow_back),
-              label: Text(l10n.cancel),
+              label: Text(l10n.back),
             ),
             Text('${_itemTab + 1} / ${_items.length}'),
             FilledButton.icon(
@@ -610,7 +622,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
                   ? null
                   : () => setState(() => _itemTab = _itemTab + 1),
               icon: const Icon(Icons.arrow_forward),
-              label: Text(l10n.apply),
+              label: Text(l10n.next),
             ),
           ],
         ),
@@ -1218,31 +1230,11 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
     }
 
     if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        icon: Icon(Icons.check_circle,
-            color: Colors.green, size: 48),
-        title: Text(l10n.orderCreated),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(l10n.orderId,
-                style: Theme.of(context).textTheme.bodySmall),
-            Text(saved.orderNo,
-                style: Theme.of(context).textTheme.headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.w700)),
-          ],
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(l10n.save),
-          ),
-        ],
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => OrderSuccessScreen(orderNo: saved.orderNo),
       ),
     );
-    if (mounted) Navigator.of(context).pop(saved);
   }
 
   // ---------- build ----------
@@ -1280,7 +1272,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
                   OutlinedButton.icon(
                     onPressed: () => setState(() => _step = _step - 1),
                     icon: const Icon(Icons.arrow_back),
-                    label: Text(l10n.cancel),
+                    label: Text(l10n.back),
                   ),
                 const Spacer(),
                 FilledButton.icon(
@@ -1290,7 +1282,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
                       : Icons.arrow_forward),
                   label: Text(_step == _stepCount - 1
                       ? l10n.save
-                      : l10n.apply),
+                      : l10n.next),
                 ),
               ],
             ),

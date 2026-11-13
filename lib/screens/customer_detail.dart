@@ -4,6 +4,7 @@ import 'package:tailor_shop/l10n/app_localizations.dart';
 
 import '../data/garment_definitions.dart';
 import '../data/report_service.dart';
+import '../util/zizi_colors.dart';
 import '../models.dart';
 import '../state/shop_provider.dart';
 import '../util/date_display.dart';
@@ -34,7 +35,9 @@ class CustomerDetailScreen extends StatelessWidget {
     }
 
     final measurements = shop.measurementsFor(customerId);
-    final orders = shop.ordersFor(customerId);
+    // Profile shows the order history oldest first (mockup).
+    final orders = shop.ordersFor(customerId).toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     final isAm = Localizations.localeOf(context).languageCode == 'am';
 
     return Scaffold(
@@ -99,7 +102,30 @@ class CustomerDetailScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          if (customer.phone.isNotEmpty)
+          // Profile header (mockup style).
+          Column(
+            children: [
+              const CircleAvatar(
+                radius: 36,
+                backgroundColor: Color(0xFFE7DBF5),
+                child: Icon(Icons.person, size: 40, color: ZiziColors.purple),
+              ),
+              const SizedBox(height: 8),
+              Text(customer.name,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w800)),
+              if (customer.phone.isNotEmpty)
+                Text(customer.phone,
+                    style: Theme.of(context).textTheme.bodySmall),
+              if (customer.address.isNotEmpty)
+                Text(customer.address,
+                    style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (customer.altPhone.isNotEmpty)
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.phone),

@@ -32,27 +32,38 @@ class GarmentMeasurementForm extends StatelessWidget {
             style: Theme.of(context).textTheme.titleSmall,
           ),
           const SizedBox(height: 8),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 3.0,
-            children: [
-              for (final field in def.measurements)
-                TextFormField(
-                  initialValue: values[field.key] ?? '',
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: field.label(isAm),
-                    border: const OutlineInputBorder(),
-                    isDense: true,
+          // Mockup-style rows: label on the left, compact value field on
+          // the right.
+          for (final field in def.measurements)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${field.label(isAm)} (cm)',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
-                  onChanged: (v) => values[field.key] = v.trim(),
-                ),
-            ],
-          ),
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 120,
+                    child: TextFormField(
+                      initialValue: values[field.key] ?? '',
+                      keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true),
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      ),
+                      onChanged: (v) => values[field.key] = v.trim(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
         if (showStyles && def.styles.isNotEmpty) ...[
           const SizedBox(height: 12),

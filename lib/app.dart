@@ -6,6 +6,7 @@ import 'data/auth_service.dart';
 import 'screens/login_screen.dart';
 import 'screens/root_shell.dart';
 import 'state/settings_provider.dart';
+import 'util/zizi_colors.dart';
 
 class TailorShopApp extends StatelessWidget {
   const TailorShopApp({super.key});
@@ -18,20 +19,19 @@ class TailorShopApp extends StatelessWidget {
       title: 'ZIZI FASHION',
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       debugShowCheckedModeBanner: false,
-      // Fashion-inspired palette: deep espresso + gold accents on warm
-      // cream surfaces (matching the ZIZU FASHION brand).
+      // Purple + gold fashion palette from the approved ZIZI FASHION mockup.
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E2A24),
-          primary: const Color(0xFF26221C),
-          secondary: const Color(0xFFB08D3E),
+          seedColor: ZiziColors.purple,
+          primary: ZiziColors.purple,
+          secondary: ZiziColors.gold,
           surface: Colors.white,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF7F2EA),
+        scaffoldBackgroundColor: ZiziColors.cream,
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF26221C),
-          foregroundColor: Color(0xFFE9DCC6),
+          backgroundColor: ZiziColors.purple,
+          foregroundColor: Colors.white,
           elevation: 0,
         ),
         cardTheme: CardThemeData(
@@ -40,7 +40,7 @@ class TailorShopApp extends StatelessWidget {
           surfaceTintColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
-            side: const BorderSide(color: Color(0xFFE8DFD0)),
+            side: const BorderSide(color: ZiziColors.cardBorder),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
@@ -48,29 +48,40 @@ class TailorShopApp extends StatelessWidget {
           fillColor: Colors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFDDD3C4)),
+            borderSide: const BorderSide(color: ZiziColors.cardBorder),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFFDDD3C4)),
+            borderSide: const BorderSide(color: ZiziColors.cardBorder),
           ),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xFF26221C),
-            foregroundColor: const Color(0xFFE9DCC6),
+            backgroundColor: ZiziColors.purple,
+            foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
           ),
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Color(0xFF26221C),
-          foregroundColor: Color(0xFFE9DCC6),
+          backgroundColor: ZiziColors.purple,
+          foregroundColor: Colors.white,
         ),
         navigationBarTheme: const NavigationBarThemeData(
           backgroundColor: Colors.white,
-          indicatorColor: Color(0xFFE9DCC6),
+          indicatorColor: Color(0xFFE7DBF5),
+        ),
+        chipTheme: ChipThemeData(
+          backgroundColor: Colors.white,
+          selectedColor: ZiziColors.purple,
+          checkmarkColor: Colors.white,
+          labelStyle: const TextStyle(color: ZiziColors.ink),
+          secondaryLabelStyle: const TextStyle(color: Colors.white),
+          side: const BorderSide(color: ZiziColors.cardBorder),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
+          ),
         ),
       ),
       locale: settings.locale,

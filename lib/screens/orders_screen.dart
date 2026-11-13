@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tailor_shop/l10n/app_localizations.dart';
@@ -9,6 +11,7 @@ import '../models.dart';
 import '../state/shop_provider.dart';
 import '../util/date_display.dart';
 import '../util/format.dart';
+import '../util/zizi_colors.dart';
 import '../widgets/status_chip.dart';
 import 'common.dart';
 import 'new_order_wizard.dart';
@@ -119,6 +122,19 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: l10n.searchHint,
+                prefixIcon: const Icon(Icons.search),
+              ),
+              onChanged: (v) => setState(() {
+                _filter.text = v;
+                _shown = 20;
+              }),
+            ),
+          ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
@@ -197,6 +213,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
+  Widget _garmentIcon() => Container(
+        width: 46,
+        height: 46,
+        color: const Color(0xFFE7DBF5),
+        child: const Icon(Icons.checkroom, color: ZiziColors.purple),
+      );
+
   Widget _orderTile(BuildContext context, ShopOrder order) {
     final l10n = AppLocalizations.of(context)!;
     final shop = context.watch<ShopProvider>();
@@ -208,12 +231,27 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final categoryTitle =
         categoryValueLabel(order.category, isAm, styleKey: order.style);
 
+    final images = shop.designImagesFor(order.id);
+    final hasPhoto = images.isNotEmpty && File(images.first.path).existsSync();
+
     return Card(
       child: ListTile(
         isThreeLine: true,
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => OrderDetailScreen(orderId: order.id)),
+        ),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: hasPhoto
+              ? Image.file(
+                  File(images.first.path),
+                  width: 46,
+                  height: 46,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _garmentIcon(),
+                )
+              : _garmentIcon(),
         ),
         title: Text('${order.orderNo.isEmpty ? '' : '${order.orderNo} · '}$categoryTitle'),
         subtitle: Column(

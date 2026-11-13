@@ -22,11 +22,11 @@ class _RootShellState extends State<RootShell> {
     return Scaffold(
       body: IndexedStack(
         index: _index,
-        children: const [
-          HomeScreen(),
-          CustomersScreen(),
-          OrdersScreen(),
-          SettingsScreen(),
+        children: [
+          HomeScreen(onGoToOrders: () => setState(() => _index = 1)),
+          const CustomersScreen(),
+          const OrdersScreen(),
+          const SettingsScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(

@@ -776,6 +776,108 @@ abstract class AppLocalizations {
   /// **'Female wear'**
   String get femaleWear;
 
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @viewMeasurements.
+  ///
+  /// In en, this message translates to:
+  /// **'View measurements'**
+  String get viewMeasurements;
+
+  /// No description provided for @orderSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Order summary'**
+  String get orderSummary;
+
+  /// No description provided for @customerInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer information'**
+  String get customerInfo;
+
+  /// No description provided for @statusTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Order status timeline'**
+  String get statusTimeline;
+
+  /// No description provided for @updateStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Update status'**
+  String get updateStatus;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get viewAll;
+
+  /// No description provided for @statTotalOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Total orders'**
+  String get statTotalOrders;
+
+  /// No description provided for @statCustomers.
+  ///
+  /// In en, this message translates to:
+  /// **'Customers'**
+  String get statCustomers;
+
+  /// No description provided for @statCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get statCompleted;
+
+  /// No description provided for @tagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Tailor Management System'**
+  String get tagline;
+
+  /// No description provided for @thankYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for choosing ZIZI FASHION'**
+  String get thankYou;
+
+  /// No description provided for @goHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Home'**
+  String get goHome;
+
+  /// No description provided for @orderSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order successfully registered!'**
+  String get orderSuccessTitle;
+
+  /// No description provided for @recentOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent orders'**
+  String get recentOrders;
+
+  /// No description provided for @registered.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered'**
+  String get registered;
+
   /// No description provided for @fieldGender.
   ///
   /// In en, this message translates to:

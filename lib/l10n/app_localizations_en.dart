@@ -353,6 +353,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get femaleWear => 'Female wear';
 
   @override
+  String get back => 'Back';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get viewMeasurements => 'View measurements';
+
+  @override
+  String get orderSummary => 'Order summary';
+
+  @override
+  String get customerInfo => 'Customer information';
+
+  @override
+  String get statusTimeline => 'Order status timeline';
+
+  @override
+  String get updateStatus => 'Update status';
+
+  @override
+  String get viewAll => 'View all';
+
+  @override
+  String get statTotalOrders => 'Total orders';
+
+  @override
+  String get statCustomers => 'Customers';
+
+  @override
+  String get statCompleted => 'Completed';
+
+  @override
+  String get tagline => 'Tailor Management System';
+
+  @override
+  String get thankYou => 'Thank you for choosing ZIZI FASHION';
+
+  @override
+  String get goHome => 'Go to Home';
+
+  @override
+  String get orderSuccessTitle => 'Order successfully registered!';
+
+  @override
+  String get recentOrders => 'Recent orders';
+
+  @override
+  String get registered => 'Registered';
+
+  @override
   String get fieldGender => 'Gender';
 
   @override

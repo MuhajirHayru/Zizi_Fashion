@@ -11,6 +11,8 @@ import '../util/date_display.dart';
 import '../util/format.dart';
 import '../widgets/garment_form.dart';
 import '../widgets/status_chip.dart';
+import '../data/report_service.dart';
+import '../util/zizi_colors.dart';
 import 'common.dart';
 import 'order_edit.dart';
 import 'payment_edit.dart';
@@ -39,6 +41,8 @@ class OrderDetailScreen extends StatelessWidget {
     final fullyPaid = order.totalPrice > 0 && balance <= 0;
     final next = nextOrderStatus(order.status);
     final items = shop.itemsFor(order.id);
+    final totalQuantity =
+        items.fold<int>(0, (sum, i) => sum + i.quantity);
     final history = shop.historyFor(order.id);
     final isAm = Localizations.localeOf(context).languageCode == 'am';
 
@@ -243,6 +247,137 @@ class OrderDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+          // Customer information (mockup style).
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.customerInfo,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  _iconRow(context, Icons.person,
+                      customer?.name ?? l10n.unknownCustomer),
+                  if (customer?.phone.isNotEmpty == true)
+                    _iconRow(context, Icons.phone, customer!.phone),
+                  if (customer?.address.isNotEmpty == true)
+                    _iconRow(context, Icons.place, customer!.address),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Order summary (mockup style).
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.orderSummary,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE7DBF5),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.checkroom,
+                            color: ZiziColors.purple),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(categoryTitle,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700)),
+                      ),
+                      Text('${l10n.quantity}: $totalQuantity',
+                          style: Theme.of(context).textTheme.bodySmall),
+                    ],
+                  ),
+                  if (order.fabric.isNotEmpty)
+                    _iconRow(context, Icons.checkroom,
+                        '${l10n.fabric}: ${order.fabric}'),
+                  if (order.fabricColor.isNotEmpty)
+                    _iconRow(context, Icons.palette,
+                        '${l10n.fabricColor}: ${order.fabricColor}'),
+                  if (order.fabricPattern.isNotEmpty)
+                    _iconRow(context, Icons.texture,
+                        '${l10n.fabricPattern}: ${order.fabricPattern}'),
+                  if (items.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        onPressed: () =>
+                            _openMeasurementsSheet(context, items, isAm, l10n),
+                        icon: const Icon(Icons.straighten),
+                        label: Text(l10n.viewMeasurements),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Order status timeline (mockup style).
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.statusTimeline,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  ..._timeline(context, history, l10n),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Update status + Print buttons (mockup style).
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () =>
+                      _showStatusSheet(context, shop, order, l10n),
+                  icon: const Icon(Icons.edit),
+                  label: Text(l10n.updateStatus),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: customer == null
+                      ? null
+                      : () => ReportService.printMeasurementSheet(
+                          customer, shop, isAm),
+                  icon: const Icon(Icons.print),
+                  label: Text(l10n.printSheet),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           if (items.isNotEmpty) ...[
             Text(l10n.orderItems,
                 style: Theme.of(context).textTheme.titleMedium),
@@ -310,32 +445,178 @@ class OrderDetailScreen extends StatelessWidget {
             icon: const Icon(Icons.payments),
             label: Text(l10n.addPayment),
           ),
-          if (history.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            Text(l10n.statusHistory,
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            for (final entry in history)
+        ],
+      ),
+    );
+  }
+
+  Widget _iconRow(BuildContext context, IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: ZiziColors.purple),
+          const SizedBox(width: 10),
+          Expanded(child: Text(text)),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _timeline(BuildContext context,
+      List<StatusHistoryEntry> history, AppLocalizations l10n) {
+    final entries = [...history]..sort((a, b) => a.changedAt.compareTo(b.changedAt));
+    if (entries.isEmpty) {
+      return [Text(l10n.noResults)];
+    }
+    final widgets = <Widget>[];
+    for (var i = 0; i < entries.length; i++) {
+      final isLast = i == entries.length - 1;
+      widgets.add(Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: isLast ? ZiziColors.purple : Colors.green,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isLast ? Icons.trip_origin : Icons.check,
+                  size: 16,
+                  color: Colors.white,
+                ),
+              ),
+              if (!isLast)
+                Container(
+                  width: 2,
+                  height: 28,
+                  color: ZiziColors.cardBorder,
+                ),
+            ],
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(statusLabel(context, entries[i].status),
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(
+                    '\${displayDate(context, entries[i].changedAt)} '
+                    '\${displayTime(context, entries[i].changedAt)}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ));
+    }
+    return widgets;
+  }
+
+  Future<void> _showStatusSheet(
+      BuildContext context, ShopProvider shop, ShopOrder order,
+      AppLocalizations l10n) async {
+    await showModalBottomSheet(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(l10n.updateStatus,
+                  style: Theme.of(sheetContext).textTheme.titleLarge),
+            ),
+            for (final status in OrderStatus.values)
               ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
                 leading: Container(
-                  width: 10,
-                  height: 10,
+                  width: 12,
+                  height: 12,
                   decoration: BoxDecoration(
-                    color: statusColors(entry.status).$1,
+                    color: statusColors(status).$1,
                     shape: BoxShape.circle,
                   ),
                 ),
-                title: Text(statusLabel(context, entry.status)),
-                subtitle: Text(
-                  '${displayDate(context, entry.changedAt)} '
-                  '${displayTime(context, entry.changedAt)}'
-                  '${entry.note.isEmpty ? '' : ' · ${entry.note}'}',
-                ),
+                title: Text(statusLabel(sheetContext, status)),
+                trailing: order.status == status
+                    ? const Icon(Icons.check, color: Colors.green)
+                    : null,
+                onTap: () {
+                  final navigator = Navigator.of(sheetContext);
+                  shop.changeOrderStatus(order, status);
+                  navigator.pop();
+                },
               ),
           ],
-        ],
+        ),
+      ),
+    );
+  }
+
+  void _openMeasurementsSheet(BuildContext context, List<OrderItem> items,
+      bool isAm, AppLocalizations l10n) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => SizedBox(
+        height: MediaQuery.of(sheetContext).size.height * 0.8,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(l10n.measurements,
+                  style: Theme.of(sheetContext).textTheme.titleLarge),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  for (final item in items)
+                    ...[
+                      Text(
+                        '${garmentByKey(item.garmentKey)?.label(isAm) ?? item.garmentKey}'
+                        '${item.quantity > 1 ? '  x${item.quantity}' : ''}',
+                        style: Theme.of(sheetContext)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(height: 4),
+                      for (final (label, value) in garmentValuePairs(
+                          garmentByKey(item.garmentKey) ?? allGarments.first,
+                          item.measurement,
+                          isAm))
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(label,
+                                  style: Theme.of(sheetContext)
+                                      .textTheme
+                                      .bodySmall),
+                              Text(value,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 12),
+                    ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
