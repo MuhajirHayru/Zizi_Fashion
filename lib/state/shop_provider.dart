@@ -26,6 +26,7 @@ class ShopProvider extends ChangeNotifier {
   List<OrderItem> items = [];
   List<StaffMember> staff = [];
   List<FabricSample> fabricSamples = [];
+  List<OrderDesignImage> designImages = [];
   String? activeStaffId;
 
   Future<void> loadAll() async {
@@ -63,6 +64,11 @@ class ShopProvider extends ChangeNotifier {
     fabricSamples = (await _db.all('fabric_samples', orderBy: 'created_at DESC'))
         .map(FabricSample.fromRow)
         .toList();
+
+    designImages =
+        (await _db.all('order_design_images', orderBy: 'created_at DESC'))
+            .map(OrderDesignImage.fromRow)
+            .toList();
 
     final prefs = await SharedPreferences.getInstance();
     activeStaffId = prefs.getString('active_staff_id');
@@ -159,6 +165,46 @@ class ShopProvider extends ChangeNotifier {
     final photo = File(sample.photoPath);
     if (await photo.exists()) {
       await photo.delete();
+    }
+    await loadAll();
+  }
+
+  // ----- design reference images -----
+
+  List<OrderDesignImage> designImagesFor(String orderId) =>
+      designImages.where((img) => img.orderId == orderId).toList();
+
+  /// Copies a captured/uploaded image into the permanent designs folder
+  /// and stores the record for the order.
+  Future<OrderDesignImage> saveOrderImage({
+    required String orderId,
+    required String groupKey,
+    required String tempPath,
+    String description = '',
+  }) async {
+    final dir = await AppStorage.designsDir();
+    final ext = tempPath.toLowerCase().endsWith('.png') ? '.png' : '.jpg';
+    final target = File(p.join(dir.path, '${const Uuid().v4()}$ext'));
+    final source = File(tempPath);
+    if (await source.exists()) {
+      await source.copy(target.path);
+    }
+    final image = OrderDesignImage.create(
+      orderId: orderId,
+      groupKey: groupKey,
+      path: target.path,
+      description: description.trim(),
+    );
+    await _db.upsert('order_design_images', image.toRow());
+    await loadAll();
+    return image;
+  }
+
+  Future<void> deleteOrderImage(OrderDesignImage image) async {
+    await _db.delete('order_design_images', image.id);
+    final file = File(image.path);
+    if (await file.exists()) {
+      await file.delete();
     }
     await loadAll();
   }

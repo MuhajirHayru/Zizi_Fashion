@@ -308,16 +308,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stepCustomer => 'Customer';
 
   @override
-  String get stepGarments => 'Garments';
+  String get stepGarments => 'Clothing';
 
   @override
   String get stepMeasurements => 'Measurements';
 
   @override
-  String get stepFabric => 'Fabric & design';
+  String get stepDesign => 'Design';
 
   @override
-  String get stepDelivery => 'Delivery & price';
+  String get stepFabric => 'Fabric';
+
+  @override
+  String get stepDelivery => 'Order details';
+
+  @override
+  String get stepReview => 'Review';
+
+  @override
+  String get designReference => 'Design reference photos';
+
+  @override
+  String get openCamera => 'Open camera';
+
+  @override
+  String get uploadImage => 'Upload image';
+
+  @override
+  String get imageDescription => 'Description';
+
+  @override
+  String get removeImage => 'Remove image';
+
+  @override
+  String get orderCreated => 'Order registered';
+
+  @override
+  String get lining => 'Lining';
+
+  @override
+  String get maleWear => 'Male wear';
+
+  @override
+  String get femaleWear => 'Female wear';
 
   @override
   String get fieldGender => 'Gender';

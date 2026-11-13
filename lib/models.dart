@@ -384,9 +384,11 @@ class ShopOrder {
 
   // ZIZI FASHION order fields.
   String orderNo; // human readable id, e.g. ZF-000012
-  String category; // 'general' (legacy) or 'graduation_men'
+  String category; // clothing category key ('mens_suit', ...)
   String assignedTo; // staff name snapshot
   String fabricSampleId; // fabric sample (photo) chosen for this order
+  String fabricColor;
+  String fabricPattern;
 
   ShopOrder({
     required this.id,
@@ -402,6 +404,8 @@ class ShopOrder {
     this.category = 'general',
     this.assignedTo = '',
     this.fabricSampleId = '',
+    this.fabricColor = '',
+    this.fabricPattern = '',
   });
 
   factory ShopOrder.create({
@@ -415,6 +419,8 @@ class ShopOrder {
     String category = 'general',
     String assignedTo = '',
     String fabricSampleId = '',
+    String fabricColor = '',
+    String fabricPattern = '',
   }) =>
       ShopOrder(
         id: const Uuid().v4(),
@@ -429,6 +435,8 @@ class ShopOrder {
         category: category,
         assignedTo: assignedTo,
         fabricSampleId: fabricSampleId,
+        fabricColor: fabricColor,
+        fabricPattern: fabricPattern,
       );
 
   Map<String, Object?> toRow() => {
@@ -444,6 +452,8 @@ class ShopOrder {
         'category': category,
         'assigned_to': assignedTo,
         'fabric_sample_id': fabricSampleId,
+        'fabric_color': fabricColor,
+        'fabric_pattern': fabricPattern,
         'created_at': createdAt.toIso8601String(),
       };
 
@@ -461,6 +471,8 @@ class ShopOrder {
         category: (r['category'] as String?) ?? 'general',
         assignedTo: (r['assigned_to'] as String?) ?? '',
         fabricSampleId: (r['fabric_sample_id'] as String?) ?? '',
+        fabricColor: (r['fabric_color'] as String?) ?? '',
+        fabricPattern: (r['fabric_pattern'] as String?) ?? '',
       );
 }
 
@@ -686,6 +698,59 @@ class StatusHistoryEntry {
         status: orderStatusFromName(r['status'] as String?),
         changedAt: _parse(r['changed_at'] as String),
         note: (r['note'] as String?) ?? '',
+      );
+}
+
+/// A design reference image captured with the camera or uploaded from
+/// the gallery, attached to an order and grouped by garment design type.
+class OrderDesignImage {
+  final String id;
+  final String orderId;
+  final String groupKey;
+  final String path;
+  final String description;
+  final DateTime createdAt;
+
+  OrderDesignImage({
+    required this.id,
+    required this.orderId,
+    required this.groupKey,
+    required this.path,
+    this.description = '',
+    required this.createdAt,
+  });
+
+  factory OrderDesignImage.create({
+    required String orderId,
+    required String groupKey,
+    required String path,
+    String description = '',
+  }) =>
+      OrderDesignImage(
+        id: const Uuid().v4(),
+        orderId: orderId,
+        groupKey: groupKey,
+        path: path,
+        description: description,
+        createdAt: DateTime.now(),
+      );
+
+  Map<String, Object?> toRow() => {
+        'id': id,
+        'order_id': orderId,
+        'group_key': groupKey,
+        'path': path,
+        'description': description,
+        'created_at': createdAt.toIso8601String(),
+      };
+
+  static OrderDesignImage fromRow(Map<String, Object?> r) => OrderDesignImage(
+        id: r['id'] as String,
+        orderId: r['order_id'] as String,
+        groupKey: (r['group_key'] as String?) ?? '',
+        path: (r['path'] as String?) ?? '',
+        description: (r['description'] as String?) ?? '',
+        createdAt: _parse(r['created_at'] as String),
       );
 }
 

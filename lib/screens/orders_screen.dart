@@ -273,17 +273,17 @@ class _OrderFilterFormState extends State<_OrderFilterForm> {
       TextEditingController(text: widget.filter.text);
   late final _tailor =
       TextEditingController(text: widget.filter.tailor);
-  late final _city =
-      TextEditingController(text: widget.filter.city);
   late final _fabric =
       TextEditingController(text: widget.filter.fabric);
+  late final _color =
+      TextEditingController(text: widget.filter.fabricColor);
 
   @override
   void dispose() {
     _text.dispose();
     _tailor.dispose();
-    _city.dispose();
     _fabric.dispose();
+    _color.dispose();
     super.dispose();
   }
 
@@ -340,8 +340,8 @@ class _OrderFilterFormState extends State<_OrderFilterForm> {
                       f.clear();
                       _text.clear();
                       _tailor.clear();
-                      _city.clear();
                       _fabric.clear();
+                      _color.clear();
                       setState(() {});
                     },
                     child: Text(l10n.clear),
@@ -416,30 +416,45 @@ class _OrderFilterFormState extends State<_OrderFilterForm> {
                   ),
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    value: f.region.isEmpty ? null : f.region,
+                    value: f.gender.isEmpty ? null : f.gender,
                     decoration: InputDecoration(
-                      labelText: l10n.fieldRegion,
+                      labelText: l10n.fieldGender,
                       border: const OutlineInputBorder(),
                     ),
                     items: [
-                      for (final o in ethiopianRegions)
+                      for (final o in genderOptions)
                         DropdownMenuItem(
                           value: o.value,
-                          child: Text(optionLabel(ethiopianRegions, o.value,
+                          child: Text(optionLabel(genderOptions, o.value,
                               Localizations.localeOf(context).languageCode ==
                                   'am')),
                         ),
                     ],
-                    onChanged: (v) => setState(() => f.region = v ?? ''),
+                    onChanged: (v) => setState(() => f.gender = v ?? ''),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: f.wear.isEmpty ? null : f.wear,
+                    decoration: InputDecoration(
+                      labelText: l10n.stepGarments,
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                          value: 'male', child: Text(l10n.maleWear)),
+                      DropdownMenuItem(
+                          value: 'female', child: Text(l10n.femaleWear)),
+                    ],
+                    onChanged: (v) => setState(() => f.wear = v ?? ''),
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
-                    controller: _city,
+                    controller: _color,
                     decoration: InputDecoration(
-                      labelText: l10n.fieldCity,
+                      labelText: l10n.fabricColor,
                       border: const OutlineInputBorder(),
                     ),
-                    onChanged: (v) => f.city = v,
+                    onChanged: (v) => f.fabricColor = v,
                   ),
                   const SizedBox(height: 16),
                   Text(l10n.orderDate,

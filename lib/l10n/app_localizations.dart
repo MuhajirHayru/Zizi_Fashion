@@ -689,7 +689,7 @@ abstract class AppLocalizations {
   /// No description provided for @stepGarments.
   ///
   /// In en, this message translates to:
-  /// **'Garments'**
+  /// **'Clothing'**
   String get stepGarments;
 
   /// No description provided for @stepMeasurements.
@@ -698,17 +698,83 @@ abstract class AppLocalizations {
   /// **'Measurements'**
   String get stepMeasurements;
 
+  /// No description provided for @stepDesign.
+  ///
+  /// In en, this message translates to:
+  /// **'Design'**
+  String get stepDesign;
+
   /// No description provided for @stepFabric.
   ///
   /// In en, this message translates to:
-  /// **'Fabric & design'**
+  /// **'Fabric'**
   String get stepFabric;
 
   /// No description provided for @stepDelivery.
   ///
   /// In en, this message translates to:
-  /// **'Delivery & price'**
+  /// **'Order details'**
   String get stepDelivery;
+
+  /// No description provided for @stepReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get stepReview;
+
+  /// No description provided for @designReference.
+  ///
+  /// In en, this message translates to:
+  /// **'Design reference photos'**
+  String get designReference;
+
+  /// No description provided for @openCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Open camera'**
+  String get openCamera;
+
+  /// No description provided for @uploadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload image'**
+  String get uploadImage;
+
+  /// No description provided for @imageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get imageDescription;
+
+  /// No description provided for @removeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove image'**
+  String get removeImage;
+
+  /// No description provided for @orderCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Order registered'**
+  String get orderCreated;
+
+  /// No description provided for @lining.
+  ///
+  /// In en, this message translates to:
+  /// **'Lining'**
+  String get lining;
+
+  /// No description provided for @maleWear.
+  ///
+  /// In en, this message translates to:
+  /// **'Male wear'**
+  String get maleWear;
+
+  /// No description provided for @femaleWear.
+  ///
+  /// In en, this message translates to:
+  /// **'Female wear'**
+  String get femaleWear;
 
   /// No description provided for @fieldGender.
   ///

@@ -171,47 +171,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
               value: _filter.gender.isEmpty ? null : _filter.gender,
               decoration: InputDecoration(
                 labelText: l10n.fieldGender,
-                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.people),
               ),
               items: [
                 for (final o in genderOptions)
                   DropdownMenuItem(value: o.value, child: Text(isAm ? o.am : o.en)),
               ],
               onChanged: (v) => setState(() => _filter.gender = v ?? ''),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              value: _filter.customerType.isEmpty ? null : _filter.customerType,
-              decoration: InputDecoration(
-                labelText: l10n.fieldCustomerType,
-                border: const OutlineInputBorder(),
-              ),
-              items: [
-                for (final o in customerTypeOptions)
-                  DropdownMenuItem(value: o.value, child: Text(isAm ? o.am : o.en)),
-              ],
-              onChanged: (v) => setState(() => _filter.customerType = v ?? ''),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              value: _filter.region.isEmpty ? null : _filter.region,
-              decoration: InputDecoration(
-                labelText: l10n.fieldRegion,
-                border: const OutlineInputBorder(),
-              ),
-              items: [
-                for (final o in ethiopianRegions)
-                  DropdownMenuItem(value: o.value, child: Text(isAm ? o.am : o.en)),
-              ],
-              onChanged: (v) => setState(() => _filter.region = v ?? ''),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              decoration: InputDecoration(
-                labelText: l10n.fieldCity,
-                border: const OutlineInputBorder(),
-              ),
-              onChanged: (v) => _filter.city = v,
             ),
             const SizedBox(height: 16),
             Row(

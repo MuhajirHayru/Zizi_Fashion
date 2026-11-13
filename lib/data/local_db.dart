@@ -24,7 +24,7 @@ class LocalDb {
     await _migrateLegacyDatabase(dbPath);
     _database = await openDatabase(
       dbPath,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -94,6 +94,8 @@ class LocalDb {
         category TEXT NOT NULL DEFAULT 'general',
         assigned_to TEXT NOT NULL DEFAULT '',
         fabric_sample_id TEXT NOT NULL DEFAULT '',
+        fabric_color TEXT NOT NULL DEFAULT '',
+        fabric_pattern TEXT NOT NULL DEFAULT '',
         created_at TEXT NOT NULL
       )
     ''');
@@ -105,6 +107,16 @@ class LocalDb {
         color TEXT NOT NULL DEFAULT '',
         pattern TEXT NOT NULL DEFAULT '',
         photo_path TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE order_design_images(
+        id TEXT PRIMARY KEY,
+        order_id TEXT NOT NULL,
+        group_key TEXT NOT NULL,
+        path TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
         created_at TEXT NOT NULL
       )
     ''');
@@ -258,6 +270,22 @@ class LocalDb {
       ''');
       await db.execute(
           "ALTER TABLE orders ADD COLUMN fabric_sample_id TEXT NOT NULL DEFAULT ''");
+    }
+    if (oldVersion < 4) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS order_design_images(
+          id TEXT PRIMARY KEY,
+          order_id TEXT NOT NULL,
+          group_key TEXT NOT NULL,
+          path TEXT NOT NULL,
+          description TEXT NOT NULL DEFAULT '',
+          created_at TEXT NOT NULL
+        )
+      ''');
+      await db.execute(
+          "ALTER TABLE orders ADD COLUMN fabric_color TEXT NOT NULL DEFAULT ''");
+      await db.execute(
+          "ALTER TABLE orders ADD COLUMN fabric_pattern TEXT NOT NULL DEFAULT ''");
     }
   }
 

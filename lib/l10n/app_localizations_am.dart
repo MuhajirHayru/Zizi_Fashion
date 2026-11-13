@@ -307,16 +307,49 @@ class AppLocalizationsAm extends AppLocalizations {
   String get stepCustomer => 'ደንበኛ';
 
   @override
-  String get stepGarments => 'የልብስ ዓይነቶች';
+  String get stepGarments => 'አለባበስ';
 
   @override
   String get stepMeasurements => 'መጠኖች';
 
   @override
-  String get stepFabric => 'ጨርቅና ንድፍ';
+  String get stepDesign => 'ንድፍ';
 
   @override
-  String get stepDelivery => 'መድረሻና ዋጋ';
+  String get stepFabric => 'ጨርቅ';
+
+  @override
+  String get stepDelivery => 'የትእዛዝ መረጃ';
+
+  @override
+  String get stepReview => 'ማጣራት';
+
+  @override
+  String get designReference => 'የንድፍ ምሳሌ ምስሎች';
+
+  @override
+  String get openCamera => 'ካሜራ ክፈት';
+
+  @override
+  String get uploadImage => 'ምስል ጫን';
+
+  @override
+  String get imageDescription => 'መግለጫ';
+
+  @override
+  String get removeImage => 'ምስል አስወግድ';
+
+  @override
+  String get orderCreated => 'ትእዛዝ ተመዝግቧል';
+
+  @override
+  String get lining => 'ላይኒንግ';
+
+  @override
+  String get maleWear => 'የወንድ ልብሶች';
+
+  @override
+  String get femaleWear => 'የሴቶች ልብሶች';
 
   @override
   String get fieldGender => 'ጾታ';

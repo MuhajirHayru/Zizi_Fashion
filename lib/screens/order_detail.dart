@@ -187,6 +187,32 @@ class OrderDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                  if (order.fabricColor.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.palette, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child:
+                              Text('${l10n.fabricColor}: ${order.fabricColor}'),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (order.fabricPattern.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.texture, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                              '${l10n.fabricPattern}: ${order.fabricPattern}'),
+                        ),
+                      ],
+                    ),
+                  ],
                   if (order.assignedTo.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Row(
@@ -223,6 +249,11 @@ class OrderDetailScreen extends StatelessWidget {
             const SizedBox(height: 8),
             for (final item in items) _itemCard(context, order, item, isAm),
           ],
+          const SizedBox(height: 16),
+          Text(l10n.designReference,
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          ..._designGallery(context, shop, order, isAm, l10n),
           const SizedBox(height: 16),
           Text(l10n.payments, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
@@ -307,6 +338,107 @@ class OrderDetailScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Design reference photos grouped by garment design type, with the
+  /// ability to remove a wrongly-captured image.
+  List<Widget> _designGallery(BuildContext context, ShopProvider shop,
+      ShopOrder order, bool isAm, AppLocalizations l10n) {
+    final images = shop.designImagesFor(order.id);
+    if (images.isEmpty) {
+      return [Text(l10n.noSamples)];
+    }
+    final groups = <String>[];
+    for (final img in images) {
+      if (!groups.contains(img.groupKey)) groups.add(img.groupKey);
+    }
+    final widgets = <Widget>[];
+    for (final group in groups) {
+      final groupImages =
+          images.where((img) => img.groupKey == group).toList();
+      widgets.add(Card(
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(designGroupLabel(group, isAm),
+                  style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 130,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: groupImages.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final image = groupImages[index];
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            File(image.path),
+                            width: 110,
+                            height: 90,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox(
+                              width: 110,
+                              height: 90,
+                              child: Icon(Icons.broken_image),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 110,
+                          child: Text(
+                            image.description.isEmpty
+                                ? '—'
+                                : image.description,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            final shopProvider = context.read<ShopProvider>();
+                            if (await confirmDelete(
+                                context, l10n.areYouSure)) {
+                              await shopProvider.deleteOrderImage(image);
+                            }
+                          },
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete_outline,
+                                  size: 14,
+                                  color:
+                                      Theme.of(context).colorScheme.error),
+                              const SizedBox(width: 4),
+                              Text(l10n.removeImage,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall
+                                      ?.copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ));
+    }
+    return widgets;
   }
 
   Widget _itemCard(

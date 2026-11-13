@@ -62,6 +62,13 @@ class AppStorage {
     return dir;
   }
 
+  static Future<Directory> designsDir() async {
+    final root = await base();
+    final dir = Directory(p.join(root.path, 'designs'));
+    if (!await dir.exists()) await dir.create(recursive: true);
+    return dir;
+  }
+
   static Future<String> databasePath() async {
     final root = await base();
     return p.join(root.path, 'zizi_fashion.db');
