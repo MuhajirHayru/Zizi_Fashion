@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +41,7 @@ Future<void> main() async {
         ChangeNotifierProvider.value(value: auth),
         ChangeNotifierProvider.value(value: shop),
       ],
-      child: _AppRoot(
+      child: AppRoot(
         settings: settings,
         auth: auth,
         shop: shop,
@@ -64,8 +66,8 @@ Future<void> _logCrash(String message, String stack) async {
 }
 
 /// Shows the brand splash until startup finished, then the real app.
-class _AppRoot extends StatelessWidget {
-  const _AppRoot({
+class AppRoot extends StatelessWidget {
+  const AppRoot({super.key, 
     required this.settings,
     required this.auth,
     required this.shop,
@@ -113,17 +115,24 @@ class _SplashScreenState extends State<_SplashScreen> {
     final settings = context.read<SettingsProvider>();
     final auth = context.read<AuthService>();
     final shop = context.read<ShopProvider>();
+
+    // Permissions must NEVER block startup: request in the background with
+    // a timeout; if the user grants later, data migrates on next launch.
+    unawaited(AppStorage.ensurePermissions()
+        .timeout(const Duration(seconds: 10), onTimeout: () {}));
+
     try {
-      await AppStorage.ensurePermissions();
-    } catch (_) {}
-    try {
-      await settings.load();
-      await auth.load();
-      await shop.loadAll();
+      await settings.load().timeout(const Duration(seconds: 15));
+      await auth.load().timeout(const Duration(seconds: 15));
+      await shop.loadAll().timeout(const Duration(seconds: 30));
     } catch (e) {
       _logCrash('startup: $e', '');
+      // Force the app open even if a step failed or timed out - the
+      // providers notify and the UI shows whatever loaded.
+      settings.markLoaded();
+      auth.markLoaded();
+      shop.markLoaded();
     }
-    // Providers notify listeners; _AppRoot swaps in the real app.
   }
 
   @override

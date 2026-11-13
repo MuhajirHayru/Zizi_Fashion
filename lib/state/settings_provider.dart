@@ -12,13 +12,21 @@ class SettingsProvider extends ChangeNotifier {
   SharedPreferences? _prefs;
 
   Future<void> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    _prefs = prefs;
-    final code = prefs.getString('locale');
-    if (code != null && (code == 'en' || code == 'am')) {
-      locale = Locale(code);
-      notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _prefs = prefs;
+      final code = prefs.getString('locale');
+      if (code != null && (code == 'en' || code == 'am')) {
+        locale = Locale(code);
+      }
+    } catch (_) {
+      // Plugin unavailable (tests) or read failure - defaults are used.
     }
+    loaded = true;
+    notifyListeners();
+  }
+
+  void markLoaded() {
     loaded = true;
     notifyListeners();
   }

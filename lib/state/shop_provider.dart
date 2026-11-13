@@ -31,6 +31,16 @@ class ShopProvider extends ChangeNotifier {
   bool loaded = false;
 
   Future<void> loadAll() async {
+    try {
+      await _loadAllInner();
+    } catch (_) {
+      // Startup must never hang: the app opens with what loaded.
+    }
+    loaded = true;
+    notifyListeners();
+  }
+
+  Future<void> _loadAllInner() async {
     customers = (await _db.all('customers'))
         .map(Customer.fromRow)
         .toList()
@@ -80,6 +90,11 @@ class ShopProvider extends ChangeNotifier {
       await prefs.setString('active_staff_id', activeStaffId!);
     }
 
+    loaded = true;
+    notifyListeners();
+  }
+
+  void markLoaded() {
     loaded = true;
     notifyListeners();
   }

@@ -32,17 +32,26 @@ class AuthService extends ChangeNotifier {
   bool get locked => _enabled && isSetUp && !_unlocked;
 
   Future<void> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    _enabled = prefs.getBool(_kEnabled) ?? false;
-    _username = prefs.getString(_kUsername);
-    _hash = prefs.getString(_kHash);
-    _salt = prefs.getString(_kSalt);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _enabled = prefs.getBool(_kEnabled) ?? false;
+      _username = prefs.getString(_kUsername);
+      _hash = prefs.getString(_kHash);
+      _salt = prefs.getString(_kSalt);
+    } catch (_) {
+      // Plugin unavailable (tests) or read failure - defaults are used.
+    }
     loaded = true;
     notifyListeners();
   }
 
   String _digest(String password, String salt) =>
       sha256.convert(utf8.encode('$salt::$password')).toString();
+
+  void markLoaded() {
+    loaded = true;
+    notifyListeners();
+  }
 
   /// Returns true and unlocks the app when username + password are correct.
   Future<bool> verify(String username, String password) async {
