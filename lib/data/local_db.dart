@@ -24,7 +24,7 @@ class LocalDb {
     await _migrateLegacyDatabase(dbPath);
     _database = await openDatabase(
       dbPath,
-      version: 4,
+      version: 5,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -32,18 +32,26 @@ class LocalDb {
   }
 
   /// On the first run with permanent storage, copies the previous
-  /// app-private database file to the new location so no existing data
+  /// database file (private app storage or the old ZIZI_ public folder)
+  /// to the new location so no existing data
   /// (customers, orders, measurements, payments) is lost.
   Future<void> _migrateLegacyDatabase(String newPath) async {
     if (await File(newPath).exists()) return;
-    try {
-      final legacyPath = p.join(await getDatabasesPath(), 'tailor_shop.db');
-      final legacy = File(legacyPath);
-      if (await legacy.exists()) {
-        await legacy.copy(newPath);
+    final candidates = <String>[
+      p.join(await getDatabasesPath(), 'tailor_shop.db'),
+      ...await AppStorage.legacyDatabasePaths(),
+    ];
+    for (final candidate in candidates) {
+      try {
+        final legacy = File(candidate);
+        if (await legacy.exists()) {
+          await legacy.copy(newPath);
+          return;
+        }
+      } catch (_) {
+        // Try the next candidate; openDatabase creates a fresh file
+        // if none can be copied.
       }
-    } catch (_) {
-      // Copy failed — openDatabase will create a fresh file instead.
     }
   }
 
@@ -115,6 +123,7 @@ class LocalDb {
         id TEXT PRIMARY KEY,
         order_id TEXT NOT NULL,
         group_key TEXT NOT NULL,
+        view_type TEXT NOT NULL DEFAULT 'front',
         path TEXT NOT NULL,
         description TEXT NOT NULL DEFAULT '',
         created_at TEXT NOT NULL
@@ -270,6 +279,10 @@ class LocalDb {
       ''');
       await db.execute(
           "ALTER TABLE orders ADD COLUMN fabric_sample_id TEXT NOT NULL DEFAULT ''");
+    }
+    if (oldVersion < 5) {
+      await db.execute(
+          "ALTER TABLE order_design_images ADD COLUMN view_type TEXT NOT NULL DEFAULT 'front'");
     }
     if (oldVersion < 4) {
       await db.execute('''

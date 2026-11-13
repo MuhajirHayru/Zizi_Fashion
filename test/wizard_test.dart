@@ -41,12 +41,15 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, 'Next'));
     await tester.pumpAndSettle();
 
-    // Clothing step: pick category, then a garment.
+    // Category step: pick a category card, then continue.
     await tester.tap(find.text("Men's suit"));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Suit jacket'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Next'));
     await tester.pumpAndSettle();
 
+    // Garments step: add a garment.
+    await tester.tap(find.text('Suit jacket'));
+    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Next'));
     await tester.pumpAndSettle();
 

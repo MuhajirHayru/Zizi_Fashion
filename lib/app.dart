@@ -16,7 +16,7 @@ class TailorShopApp extends StatelessWidget {
     final settings = context.watch<SettingsProvider>();
     final auth = context.watch<AuthService>();
     return MaterialApp(
-      title: 'ZIZI FASHION',
+      title: 'ZIZU FASHION',
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       debugShowCheckedModeBanner: false,
       // Purple + gold fashion palette from the approved ZIZI FASHION mockup.
@@ -28,7 +28,7 @@ class TailorShopApp extends StatelessWidget {
           secondary: ZiziColors.gold,
           surface: Colors.white,
         ),
-        scaffoldBackgroundColor: ZiziColors.cream,
+        scaffoldBackgroundColor: ZiziColors.background,
         appBarTheme: const AppBarTheme(
           backgroundColor: ZiziColors.purple,
           foregroundColor: Colors.white,

@@ -30,6 +30,41 @@ class _OrdersScreenState extends State<OrdersScreen> {
   /// Pagination: load the list in pages as the user scrolls.
   int _shown = 20;
 
+  /// Quick tabs (spec section 4): all / recent / pending / in progress /
+  /// completed / delivered, each with its own sorting rule.
+  String _quickTab = 'all';
+
+  static const Map<String, List<OrderStatus>> _tabStatuses = {
+    'pending': [
+      OrderStatus.newOrder,
+      OrderStatus.measurementCompleted,
+      OrderStatus.fabricPreparation,
+    ],
+    'progress': [
+      OrderStatus.inProduction,
+      OrderStatus.sewingInProgress,
+      OrderStatus.readyForFitting,
+      OrderStatus.modificationRequired,
+    ],
+    'completed': [OrderStatus.completed],
+    'delivered': [OrderStatus.delivered],
+  };
+
+  List<ShopOrder> _tabList(List<ShopOrder> orders) {
+    List<ShopOrder> list;
+    if (_quickTab == 'all') {
+      list = orders.where((o) => o.status != OrderStatus.cancelled).toList()
+        ..sort((a, b) => a.createdAt.compareTo(b.createdAt)); // oldest first
+    } else if (_quickTab == 'recent') {
+      list = List.of(orders); // newest first (provider order)
+    } else {
+      final statuses = _tabStatuses[_quickTab]!;
+      list = orders.where((o) => statuses.contains(o.status)).toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+    return list;
+  }
+
   Future<void> _openFilterSheet() async {
     final applied = await showOrderFilterSheet(context, _filter);
     if (applied) {
@@ -70,7 +105,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final l10n = AppLocalizations.of(context)!;
     final shop = context.watch<ShopProvider>();
 
-    final list = _filter.apply(shop.orders, shop);
+    final list = _filter.apply(_tabList(shop.orders), shop);
     final shown = list.take(_shown).toList();
 
     return Scaffold(
@@ -140,40 +175,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(l10n.allStatuses),
-                    selected: _filter.status == null,
-                    onSelected: (_) =>
-                        setState(() { _filter.status = null; _shown = 20; }),
-                  ),
-                ),
-                for (final status in OrderStatus.values)
+                for (final tab in [
+                  ('all', l10n.allStatuses),
+                  ('recent', l10n.sortNewest),
+                  ('pending', l10n.statusPending),
+                  ('progress', l10n.statInProgress),
+                  ('completed', l10n.statusFinished),
+                  ('delivered', l10n.statusCollected),
+                ])
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
-                      label: Text(statusLabel(context, status)),
-                      selected: _filter.status == status,
-                      onSelected: (_) =>
-                          setState(() { _filter.status = status; _shown = 20; }),
+                      label: Text(tab.$2),
+                      selected: _quickTab == tab.$1,
+                      onSelected: (_) => setState(() {
+                        _quickTab = tab.$1;
+                        _shown = 20;
+                      }),
                     ),
                   ),
-                ActionChip(
-                  avatar: Icon(
-                    _filter.newestFirst
-                        ? Icons.arrow_downward
-                        : Icons.arrow_upward,
-                    size: 16,
-                  ),
-                  label: Text(_filter.newestFirst
-                      ? l10n.sortNewest
-                      : l10n.sortOldest),
-                  onPressed: () => setState(() {
-                    _filter.newestFirst = !_filter.newestFirst;
-                    _shown = 20;
-                  }),
-                ),
               ],
             ),
           ),
@@ -223,8 +243,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget _orderTile(BuildContext context, ShopOrder order) {
     final l10n = AppLocalizations.of(context)!;
     final shop = context.watch<ShopProvider>();
-    final customerName =
-        shop.customerById(order.customerId)?.name ?? l10n.unknownCustomer;
+    final customer = shop.customerById(order.customerId);
+    final customerName = customer?.name ?? l10n.unknownCustomer;
+    final customerPhone = customer?.phone ?? '';
     final balance = shop.balanceFor(order);
     final fullyPaid = order.totalPrice > 0 && balance <= 0;
     final isAm = Localizations.localeOf(context).languageCode == 'am';
@@ -258,6 +279,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(customerName),
+            if (customerPhone.isNotEmpty) Text(customerPhone),
             const SizedBox(height: 4),
             StatusChip(status: order.status, dense: true),
           ],

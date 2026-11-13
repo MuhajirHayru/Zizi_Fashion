@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:tailor_shop/l10n/app_localizations.dart';
+import '../util/ethiopian_calendar.dart' show todayInAddis;
 import '../util/zizi_colors.dart';
 
+import 'new_order_wizard.dart';
+import 'order_detail.dart';
+
 /// Full-screen order confirmation (confetti + green check + gold Order ID
-/// chip), matching the approved mockup.
+/// chip + customer name + View Order / New Order buttons), matching the
+/// approved ZIZU FASHION mockup.
 class OrderSuccessScreen extends StatelessWidget {
-  const OrderSuccessScreen({super.key, required this.orderNo});
+  const OrderSuccessScreen({
+    super.key,
+    required this.orderNo,
+    required this.orderId,
+    required this.customerName,
+  });
 
   final String orderNo;
+  final String orderId;
+  final String customerName;
 
   @override
   Widget build(BuildContext context) {
@@ -15,16 +27,19 @@ class OrderSuccessScreen extends StatelessWidget {
     // Decorative confetti dots.
     const confetti = [
       (0.12, 0.10, ZiziColors.gold, 14.0),
-      (0.30, 0.06, Color(0xFF5B2A86), 10.0),
-      (0.72, 0.08, Color(0xFF2FA36B), 12.0),
-      (0.86, 0.16, Color(0xFFE4572E), 10.0),
+      (0.30, 0.06, Color(0xFF6B278A), 10.0),
+      (0.72, 0.08, Color(0xFF218B55), 12.0),
+      (0.86, 0.16, Color(0xFFD64A4A), 10.0),
       (0.10, 0.22, Color(0xFF2F80ED), 10.0),
       (0.90, 0.28, ZiziColors.gold, 14.0),
       (0.06, 0.36, Color(0xFFBB6BD9), 10.0),
-      (0.93, 0.44, Color(0xFF2FA36B), 12.0),
+      (0.93, 0.44, Color(0xFF218B55), 12.0),
       (0.14, 0.52, ZiziColors.gold, 10.0),
-      (0.88, 0.62, Color(0xFF5B2A86), 10.0),
+      (0.88, 0.62, Color(0xFF6B278A), 10.0),
     ];
+    final n = todayInAddis();
+    final registered =
+        '${n.year}-${n.month.toString().padLeft(2, '0')}-${n.day.toString().padLeft(2, '0')}';
 
     return Scaffold(
       backgroundColor: ZiziColors.cream,
@@ -37,10 +52,7 @@ class OrderSuccessScreen extends StatelessWidget {
               child: Container(
                 width: size,
                 height: size,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
             ),
           Center(
@@ -50,8 +62,8 @@ class OrderSuccessScreen extends StatelessWidget {
                 Container(
                   width: 96,
                   height: 96,
-                  decoration:
-                      const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                  decoration: const BoxDecoration(
+                      color: ZiziColors.success, shape: BoxShape.circle),
                   child: const Icon(Icons.check, color: Colors.white, size: 56),
                 ),
                 const SizedBox(height: 20),
@@ -84,14 +96,33 @@ class OrderSuccessScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+                Text(customerName,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700)),
+                Text(registered,
+                    style: Theme.of(context).textTheme.bodySmall),
                 const SizedBox(height: 16),
                 Text(l10n.thankYou),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 FilledButton.icon(
-                  onPressed: () =>
-                      Navigator.of(context).popUntil((route) => route.isFirst),
-                  icon: const Icon(Icons.home),
-                  label: Text(l10n.goHome),
+                  onPressed: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (_) => OrderDetailScreen(orderId: orderId),
+                    ),
+                  ),
+                  icon: const Icon(Icons.visibility),
+                  label: Text(l10n.viewOrder),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const NewOrderWizard()),
+                  ),
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.newOrder),
                 ),
               ],
             ),

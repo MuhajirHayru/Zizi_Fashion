@@ -707,6 +707,7 @@ class OrderDesignImage {
   final String id;
   final String orderId;
   final String groupKey;
+  final String viewType; // front / back / side / fabric / detail / inspiration
   final String path;
   final String description;
   final DateTime createdAt;
@@ -715,6 +716,7 @@ class OrderDesignImage {
     required this.id,
     required this.orderId,
     required this.groupKey,
+    this.viewType = 'front',
     required this.path,
     this.description = '',
     required this.createdAt,
@@ -724,12 +726,14 @@ class OrderDesignImage {
     required String orderId,
     required String groupKey,
     required String path,
+    String viewType = 'front',
     String description = '',
   }) =>
       OrderDesignImage(
         id: const Uuid().v4(),
         orderId: orderId,
         groupKey: groupKey,
+        viewType: viewType,
         path: path,
         description: description,
         createdAt: DateTime.now(),
@@ -739,6 +743,7 @@ class OrderDesignImage {
         'id': id,
         'order_id': orderId,
         'group_key': groupKey,
+        'view_type': viewType,
         'path': path,
         'description': description,
         'created_at': createdAt.toIso8601String(),
@@ -748,6 +753,7 @@ class OrderDesignImage {
         id: r['id'] as String,
         orderId: r['order_id'] as String,
         groupKey: (r['group_key'] as String?) ?? '',
+        viewType: (r['view_type'] as String?) ?? 'front',
         path: (r['path'] as String?) ?? '',
         description: (r['description'] as String?) ?? '',
         createdAt: _parse(r['created_at'] as String),

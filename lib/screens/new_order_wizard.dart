@@ -33,9 +33,10 @@ class _WizardItem {
 /// A design reference image captured/uploaded, waiting to be saved with
 /// the order.
 class _DesignDraft {
-  _DesignDraft(this.groupKey, this.filePath);
+  _DesignDraft(this.groupKey, this.filePath, this.viewType);
   final String groupKey;
   final String filePath;
+  final String viewType;
   String description = '';
 }
 
@@ -51,7 +52,7 @@ class NewOrderWizard extends StatefulWidget {
 }
 
 class _NewOrderWizardState extends State<NewOrderWizard> {
-  static const int _stepCount = 7;
+  static const int _stepCount = 8;
 
   int _step = 0;
   int _itemTab = 0;
@@ -75,6 +76,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
   DateTime? _delivery;
   String _assignedTo = '';
   String _fabricSampleId = '';
+  String _designViewType = 'front';
   final List<_WizardItem> _items = [];
   final List<_DesignDraft> _designs = [];
 
@@ -129,12 +131,18 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
         }
         return true;
       case 1:
+        if (_categoryKey.isEmpty) {
+          showSnack(context, l10n.stepCategory);
+          return false;
+        }
+        return true;
+      case 2:
         if (_items.isEmpty) {
           showSnack(context, l10n.noGarments);
           return false;
         }
         return true;
-      case 2:
+      case 3:
         final missing =
             _items.where((i) => i.filledCount == 0).toList();
         if (missing.isNotEmpty) {
@@ -175,6 +183,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
 
   List<String> _stepLabels(AppLocalizations l10n) => [
         l10n.stepCustomer,
+        l10n.stepCategory,
         l10n.stepGarments,
         l10n.stepMeasurements,
         l10n.stepDesign,
@@ -417,7 +426,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
 
   // ---------- step 1: clothing ----------
 
-  Widget _clothingStep() {
+  Widget _categoryStep() {
     final l10n = AppLocalizations.of(context)!;
     final categories = clothingCategories
         .where((c) =>
@@ -425,23 +434,94 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
             (c.wearGroup == WearGroup.male && _gender == 'male') ||
             (c.wearGroup == WearGroup.female && _gender == 'female'))
         .toList();
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        for (final group in [WearGroup.male, WearGroup.female])
+          if (categories.any((c) => c.wearGroup == group)) ...[
+            Text(wearGroupLabel(group, _isAm),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 2.6,
+              children: [
+                for (final c in categories)
+                  if (c.wearGroup == group)
+                    InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () => setState(() => _categoryKey = c.key),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: _categoryKey == c.key
+                              ? ZiziColors.purple
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: _categoryKey == c.key
+                                ? ZiziColors.purple
+                                : ZiziColors.cardBorder,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.checkroom,
+                                size: 26,
+                                color: _categoryKey == c.key
+                                    ? ZiziColors.gold
+                                    : ZiziColors.purple),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                c.label(_isAm),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: _categoryKey == c.key
+                                      ? Colors.white
+                                      : ZiziColors.ink,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
+        if (_categoryKey.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Center(child: Text(l10n.stepCategory)),
+          ),
+      ],
+    );
+  }
+
+  Widget _garmentsStep() {
+    final l10n = AppLocalizations.of(context)!;
     final selected = categoryByKey(_categoryKey);
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          children: [
-            for (final c in categories)
-              ChoiceChip(
-                label: Text(c.label(_isAm)),
-                selected: _categoryKey == c.key,
-                onSelected: (_) => setState(() => _categoryKey = c.key),
-              ),
-          ],
-        ),
+        if (selected != null)
+          Text(selected.label(_isAm),
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
         const SizedBox(height: 12),
         if (selected != null) ...[
           FilledButton.tonalIcon(
@@ -601,6 +681,24 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
                   ],
                 ),
                 const SizedBox(height: 8),
+                // Garment reference image (from the design samples) above
+                // the measurement fields, as in the mockup.
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: _designs.any((d) => d.groupKey == def.designGroup)
+                      ? Image.file(
+                          File(_designs
+                              .firstWhere(
+                                  (d) => d.groupKey == def.designGroup)
+                              .filePath),
+                          height: 150,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => _garmentPlaceholder(),
+                        )
+                      : _garmentPlaceholder(),
+                ),
+                const SizedBox(height: 12),
                 GarmentMeasurementForm(
                   def: def,
                   values: item.measurement,
@@ -633,6 +731,13 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
       ],
     );
   }
+
+  Widget _garmentPlaceholder() => Container(
+        height: 150,
+        width: double.infinity,
+        color: const Color(0xFFE7DBF5),
+        child: const Icon(Icons.checkroom, size: 44, color: ZiziColors.purple),
+      );
 
   Widget _garmentTab(_WizardItem item, int index) {
     final total = item.def.measurements.length;
@@ -679,6 +784,17 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
         Text(l10n.designReference,
             style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          initialValue: _designViewType,
+          decoration: InputDecoration(labelText: l10n.designViewType),
+          items: [
+            for (final o in designViewTypes)
+              DropdownMenuItem(
+                  value: o.value, child: Text(_isAm ? o.am : o.en)),
+          ],
+          onChanged: (v) => setState(() => _designViewType = v ?? 'front'),
+        ),
+        const SizedBox(height: 8),
         for (final group in groups)
           Card(
             margin: const EdgeInsets.only(bottom: 12),
@@ -710,7 +826,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
                   for (final draft in _designs
                       .where((d) => d.groupKey == group)
                       .toList())
-                    Row(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
@@ -724,16 +840,14 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
                                 const Icon(Icons.broken_image),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextFormField(
-                            initialValue: draft.description,
-                            decoration: InputDecoration(
-                              labelText: l10n.imageDescription,
-                              isDense: true,
-                            ),
-                            onChanged: (v) => draft.description = v.trim(),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          initialValue: draft.description,
+                          decoration: InputDecoration(
+                            labelText: l10n.imageDescription,
+                            isDense: true,
                           ),
+                          onChanged: (v) => draft.description = v.trim(),
                         ),
                         IconButton(
                           tooltip: l10n.removeImage,
@@ -741,6 +855,8 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
                           onPressed: () =>
                               setState(() => _designs.remove(draft)),
                         ),
+                        Text(optionLabel(designViewTypes, draft.viewType, _isAm),
+                            style: Theme.of(context).textTheme.labelSmall),
                       ],
                     ),
                 if (!_designs.any((d) => d.groupKey == group))
@@ -770,7 +886,8 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
       return;
     }
     if (photo == null || !mounted) return;
-    setState(() => _designs.add(_DesignDraft(group, photo!.path)));
+    setState(() =>
+        _designs.add(_DesignDraft(group, photo!.path, _designViewType)));
   }
 
   // ---------- step 4: fabric ----------
@@ -1067,8 +1184,21 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.stepCustomer,
+                Row(
+                    children: [
+                      Expanded(
+                        child: Text(l10n.stepCustomer,
                     style: Theme.of(context).textTheme.titleSmall),
+                      ),
+                      InkWell(
+                        onTap: () => setState(() => _step = 0),
+                        child: Text(l10n.edit,
+                            style: const TextStyle(
+                                color: ZiziColors.purple,
+                                fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
                 const SizedBox(height: 6),
                 _infoRow(l10n.fieldName, _name.text.trim()),
                 _infoRow(l10n.fieldPhone, _phone.text.trim()),
@@ -1086,8 +1216,21 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.stepGarments,
+                Row(
+                    children: [
+                      Expanded(
+                        child: Text(l10n.stepGarments,
                     style: Theme.of(context).textTheme.titleSmall),
+                      ),
+                      InkWell(
+                        onTap: () => setState(() => _step = 2),
+                        child: Text(l10n.edit,
+                            style: const TextStyle(
+                                color: ZiziColors.purple,
+                                fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
                 const SizedBox(height: 6),
                 for (final item in _items)
                   _infoRow(item.def.label(_isAm),
@@ -1103,8 +1246,21 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.designReference,
+                Row(
+                    children: [
+                      Expanded(
+                        child: Text(l10n.designReference,
                     style: Theme.of(context).textTheme.titleSmall),
+                      ),
+                      InkWell(
+                        onTap: () => setState(() => _step = 4),
+                        child: Text(l10n.edit,
+                            style: const TextStyle(
+                                color: ZiziColors.purple,
+                                fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
                 const SizedBox(height: 6),
                 for (final group in _designs
                     .map((d) => d.groupKey)
@@ -1122,8 +1278,21 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.stepFabric,
+                Row(
+                    children: [
+                      Expanded(
+                        child: Text(l10n.stepFabric,
                     style: Theme.of(context).textTheme.titleSmall),
+                      ),
+                      InkWell(
+                        onTap: () => setState(() => _step = 5),
+                        child: Text(l10n.edit,
+                            style: const TextStyle(
+                                color: ZiziColors.purple,
+                                fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
                 const SizedBox(height: 6),
                 _infoRow(l10n.fabric, _fabric.text.trim()),
                 _infoRow(l10n.fabricColor, _fabricColor.text.trim()),
@@ -1145,8 +1314,21 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.stepDelivery,
+                Row(
+                    children: [
+                      Expanded(
+                        child: Text(l10n.stepDelivery,
                     style: Theme.of(context).textTheme.titleSmall),
+                      ),
+                      InkWell(
+                        onTap: () => setState(() => _step = 6),
+                        child: Text(l10n.edit,
+                            style: const TextStyle(
+                                color: ZiziColors.purple,
+                                fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ),
                 const SizedBox(height: 6),
                 _infoRow(l10n.deliveryDate, displayDate(context, _delivery)),
                 _infoRow(l10n.totalPrice,
@@ -1229,6 +1411,7 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
         orderId: saved.id,
         groupKey: draft.groupKey,
         tempPath: draft.filePath,
+        viewType: draft.viewType,
         description: draft.description,
       );
     }
@@ -1236,7 +1419,11 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => OrderSuccessScreen(orderNo: saved.orderNo),
+        builder: (_) => OrderSuccessScreen(
+          orderNo: saved.orderNo,
+          customerName: _name.text.trim(),
+          orderId: saved.id,
+        ),
       ),
     );
   }
@@ -1245,11 +1432,12 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
 
   Widget _buildStep(int step) => switch (step) {
         0 => _customerStep(),
-        1 => _clothingStep(),
-        2 => _measurementsStep(),
-        3 => _designStep(),
-        4 => _fabricStep(),
-        5 => _detailsStep(),
+        1 => _categoryStep(),
+        2 => _garmentsStep(),
+        3 => _measurementsStep(),
+        4 => _designStep(),
+        5 => _fabricStep(),
+        6 => _detailsStep(),
         _ => _reviewStep(),
       };
 

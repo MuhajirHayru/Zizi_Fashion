@@ -63,14 +63,39 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(
-                      20, 24 + MediaQuery.of(context).padding.top, 20, 24),
+                      20, 16 + MediaQuery.of(context).padding.top, 20, 24),
                   child: Column(
                     children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              l10n.welcome(shop.activeStaff?.name ?? ''),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.notifications,
+                                  color: ZiziColors.gold),
+                              onPressed: () => _showNotifications(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
                       const Icon(Icons.checkroom,
                           color: ZiziColors.gold, size: 34),
                       const SizedBox(height: 4),
                       const Text(
-                        'ZIZI FASHION',
+                        'ZIZU FASHION',
                         style: TextStyle(
                           color: ZiziColors.gold,
                           fontSize: 24,
@@ -122,6 +147,15 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _StatCard(
+              icon: Icons.timelapse,
+              value: shop.openOrderCount.toString(),
+              label: l10n.statInProgress,
             ),
           ),
           const SizedBox(height: 16),
@@ -201,6 +235,50 @@ class HomeScreen extends StatelessWidget {
             for (final order in recent)
               _RecentOrderCard(order: order),
           const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  /// Notification bell: shows real overdue orders (nothing fake).
+  void _showNotifications(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final shop = context.read<ShopProvider>();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final overdue = shop.orders
+        .where((o) =>
+            orderIsOpen(o.status) &&
+            o.deliveryDate != null &&
+            DateTime(o.deliveryDate!.year, o.deliveryDate!.month,
+                    o.deliveryDate!.day)
+                .isBefore(today))
+        .toList();
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.overdue),
+        content: overdue.isEmpty
+            ? Text(l10n.noResults)
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final o in overdue.take(6))
+                    ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.warning,
+                          color: ZiziColors.warning),
+                      title: Text(o.orderNo),
+                      subtitle: Text(displayDate(context, o.deliveryDate)),
+                    ),
+                ],
+              ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text(l10n.cancel),
+          ),
         ],
       ),
     );

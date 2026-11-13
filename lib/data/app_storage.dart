@@ -4,15 +4,14 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-/// ZIZI FASHION permanent storage.
+/// ZIZU FASHION permanent storage.
 ///
 /// On Android the shop data lives in the public folder
-/// `/storage/emulated/0/ZIZI_FASHION` — visible in any file manager and
+/// `/storage/emulated/0/ZIZU_FASHION` — visible in any file manager and
 /// **not** deleted when the app is uninstalled or its data is cleared.
 /// It is granted through Android's "All files access" special permission
 /// (requested on first launch). If the user declines, the app falls back
-/// to its private documents folder so nothing ever blocks startup; the
-/// data then follows normal app-storage rules.
+/// to its private documents folder so nothing ever blocks startup.
 class AppStorage {
   AppStorage._();
   static Directory? _base;
@@ -38,7 +37,7 @@ class AppStorage {
       final legacy = await Permission.storage.isGranted;
       if (manage || legacy) {
         try {
-          final dir = Directory('/storage/emulated/0/ZIZI_FASHION');
+          final dir = Directory('/storage/emulated/0/ZIZU_FASHION');
           if (!await dir.exists()) {
             await dir.create(recursive: true);
           }
@@ -72,5 +71,17 @@ class AppStorage {
   static Future<String> databasePath() async {
     final root = await base();
     return p.join(root.path, 'zizi_fashion.db');
+  }
+
+  /// Previous storage locations whose database should be carried over to
+  /// the permanent folder (private app storage and the old ZIZI_ folder).
+  static Future<List<String>> legacyDatabasePaths() async {
+    final paths = <String>[];
+    try {
+      final docs = await getApplicationDocumentsDirectory();
+      paths.add(p.join(docs.path, 'zizi_fashion.db'));
+    } catch (_) {}
+    paths.add('/storage/emulated/0/ZIZI_FASHION/zizi_fashion.db');
+    return paths;
   }
 }

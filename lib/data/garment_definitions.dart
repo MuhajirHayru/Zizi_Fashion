@@ -662,6 +662,16 @@ String wearGroupLabel(WearGroup group, bool isAm) =>
         ? (isAm ? 'የወንድ ልብሶች' : 'Male wear')
         : (isAm ? 'የሴቶች ልብሶች' : 'Female wear');
 
+/// Design reference photo view categories (spec section 9).
+const List<FieldOption> designViewTypes = [
+  FieldOption('front', 'Front view', 'የፊት እይታ'),
+  FieldOption('back', 'Back view', 'የኋላ እይታ'),
+  FieldOption('side', 'Side view', 'የጎን እይታ'),
+  FieldOption('fabric', 'Fabric sample', 'የጨርቅ ናሙና'),
+  FieldOption('detail', 'Detail reference', 'የዝርዝር ማጣቀሻ'),
+  FieldOption('inspiration', 'Inspiration', 'መᐩኒያ'),
+];
+
 /// Ethiopian regions (kept for legacy customer data display).
 const List<FieldOption> ethiopianRegions = [
   FieldOption('addis_ababa', 'Addis Ababa', 'አዲስ አበባ'),

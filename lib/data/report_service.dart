@@ -109,7 +109,7 @@ class ReportService {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('ZIZI FASHION',
+              pw.Text('ZIZU FASHION',
                   style: pw.TextStyle(
                       fontSize: 20, fontWeight: pw.FontWeight.bold)),
               pw.Text(
@@ -184,7 +184,7 @@ class ReportService {
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('ZIZI FASHION',
+            pw.Text('ZIZU FASHION',
                 style:
                     pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
             pw.Text(l('Customer measurement sheet', 'የደንበኛ መጠን ማስታወሻ')),

@@ -180,6 +180,7 @@ class ShopProvider extends ChangeNotifier {
     required String orderId,
     required String groupKey,
     required String tempPath,
+    String viewType = 'front',
     String description = '',
   }) async {
     final dir = await AppStorage.designsDir();
@@ -192,6 +193,7 @@ class ShopProvider extends ChangeNotifier {
     final image = OrderDesignImage.create(
       orderId: orderId,
       groupKey: groupKey,
+      viewType: viewType,
       path: target.path,
       description: description.trim(),
     );

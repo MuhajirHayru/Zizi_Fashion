@@ -9,7 +9,7 @@ class AppLocalizationsAm extends AppLocalizations {
   AppLocalizationsAm([String locale = 'am']) : super(locale);
 
   @override
-  String get appTitle => 'ዚዚ ፋሽን';
+  String get appTitle => 'ዚዙ ፋሽን';
 
   @override
   String get tabHome => 'መነሻ';
@@ -388,7 +388,7 @@ class AppLocalizationsAm extends AppLocalizations {
   String get tagline => 'የልብስ ስፌት አስተዳደር ስርዓት';
 
   @override
-  String get thankYou => 'ዚዚ ፋሽንን ስለመረጡን እናመሰግናለን';
+  String get thankYou => 'ዚዙ ፋሽንን ስለመረጡን እናመሰግናለን';
 
   @override
   String get goHome => 'ወደ መነሻ ተመለስ';
@@ -400,7 +400,51 @@ class AppLocalizationsAm extends AppLocalizations {
   String get recentOrders => 'የቅርብ ትእዛዞች';
 
   @override
+  String get tabReports => 'ሪፖርቶች';
+
+  @override
+  String get tabMore => 'ተጨማሪ';
+
+  @override
+  String get statInProgress => 'በሥራ ላይ';
+
+  @override
+  String get viewCustomer => 'ደንበኛውን ተመልከት';
+
+  @override
+  String get stepCategory => 'ምድብ';
+
+  @override
+  String get viewOrder => 'ትእዛዙን ተመልከት';
+
+  @override
+  String get designViewType => 'የፎቶ ዓይነት';
+
+  @override
+  String get viewFront => 'የፊት እይታ';
+
+  @override
+  String get viewBack => 'የኋላ እይታ';
+
+  @override
+  String get viewSide => 'የጎን እይታ';
+
+  @override
+  String get viewFabric => 'የጨርቅ ናሙና';
+
+  @override
+  String get viewDetail => 'የዝርዝር ማጣቀሻ';
+
+  @override
+  String get viewInspiration => 'መᐩኒያ';
+
+  @override
   String get registered => 'የተመዘገበበት';
+
+  @override
+  String welcome(String name) {
+    return 'እንኳን ደህና መጡ, $name';
+  }
 
   @override
   String get fieldGender => 'ጾታ';

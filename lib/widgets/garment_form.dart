@@ -33,37 +33,54 @@ class GarmentMeasurementForm extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           // Mockup-style rows: label on the left, compact value field on
-          // the right.
-          for (final field in def.measurements)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      '${field.label(isAm)} (cm)',
-                      style: Theme.of(context).textTheme.bodyMedium,
+          // the right. Two columns on larger screens, one on narrow.
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final rows = [
+                for (final field in def.measurements)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${field.label(isAm)} (cm)',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        SizedBox(
+                          width: 120,
+                          child: TextFormField(
+                            initialValue: values[field.key] ?? '',
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            textAlign: TextAlign.center,
+                            decoration: const InputDecoration(
+                              isDense: true,
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                            ),
+                            onChanged: (v) => values[field.key] = v.trim(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 120,
-                    child: TextFormField(
-                      initialValue: values[field.key] ?? '',
-                      keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true),
-                      textAlign: TextAlign.center,
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                      ),
-                      onChanged: (v) => values[field.key] = v.trim(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+              ];
+              if (constraints.maxWidth >= 520) {
+                final half = (constraints.maxWidth - 16) / 2;
+                return Wrap(
+                  spacing: 16,
+                  children: [
+                    for (final row in rows)
+                      SizedBox(width: half, child: row),
+                  ],
+                );
+              }
+              return Column(children: rows);
+            },
+          ),
         ],
         if (showStyles && def.styles.isNotEmpty) ...[
           const SizedBox(height: 12),

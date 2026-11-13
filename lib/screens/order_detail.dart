@@ -17,10 +17,27 @@ import 'common.dart';
 import 'order_edit.dart';
 import 'payment_edit.dart';
 
-class OrderDetailScreen extends StatelessWidget {
+class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({super.key, required this.orderId});
 
   final String orderId;
+
+  @override
+  State<OrderDetailScreen> createState() => _OrderDetailScreenState();
+}
+
+class _OrderDetailScreenState extends State<OrderDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController =
+      TabController(length: 6, vsync: this);
+
+  String get orderId => widget.orderId;
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,10 +100,33 @@ class OrderDetailScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          Card(
+          Container(
+            color: ZiziColors.purple,
+            child: TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              indicatorColor: ZiziColors.gold,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              tabs: [
+                Tab(text: l10n.stepCustomer),
+                Tab(text: l10n.stepGarments),
+                Tab(text: l10n.stepMeasurements),
+                Tab(text: l10n.designReference),
+                Tab(text: l10n.statusTimeline),
+                Tab(text: l10n.statusHistory),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [          Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -333,64 +373,6 @@ class OrderDetailScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          // Order status timeline (mockup style).
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.statusTimeline,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium
-                          ?.copyWith(fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 8),
-                  ..._timeline(context, history, l10n),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Update status + Print buttons (mockup style).
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () =>
-                      _showStatusSheet(context, shop, order, l10n),
-                  icon: const Icon(Icons.edit),
-                  label: Text(l10n.updateStatus),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: customer == null
-                      ? null
-                      : () => ReportService.printMeasurementSheet(
-                          customer, shop, isAm),
-                  icon: const Icon(Icons.print),
-                  label: Text(l10n.printSheet),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (items.isNotEmpty) ...[
-            Text(l10n.orderItems,
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            for (final item in items) _itemCard(context, order, item, isAm),
-          ],
-          const SizedBox(height: 16),
-          Text(l10n.designReference,
-              style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          ..._designGallery(context, shop, order, isAm, l10n),
-          const SizedBox(height: 16),
-          Text(l10n.payments, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           Card(
             child: Padding(
@@ -444,6 +426,90 @@ class OrderDetailScreen extends StatelessWidget {
             onPressed: () => showPaymentEditor(context, order),
             icon: const Icon(Icons.payments),
             label: Text(l10n.addPayment),
+          ),
+],
+                ),
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+            Text(l10n.orderItems,
+                style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            for (final item in items) _itemCard(context, order, item, isAm),
+          ],
+                ),
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    ..._measurementsList(context, items, isAm),
+                  ],
+                ),
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+          const SizedBox(height: 16),
+          Text(l10n.designReference,
+              style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          ..._designGallery(context, shop, order, isAm, l10n),
+],
+                ),
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [          const SizedBox(height: 12),
+          // Order status timeline (mockup style).
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.statusTimeline,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  ..._timeline(context, history, l10n),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Update status + Print buttons (mockup style).
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () =>
+                      _showStatusSheet(context, shop, order, l10n),
+                  icon: const Icon(Icons.edit),
+                  label: Text(l10n.updateStatus),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: customer == null
+                      ? null
+                      : () => ReportService.printMeasurementSheet(
+                          customer, shop, isAm),
+                  icon: const Icon(Icons.print),
+                  label: Text(l10n.printSheet),
+                ),
+              ),
+            ],
+          ),
+],
+                ),
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    ..._historyTiles(context, history, isAm, l10n),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -619,6 +685,91 @@ class OrderDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  List<Widget> _measurementsList(
+      BuildContext context, List<OrderItem> items, bool isAm) {
+    return [
+      for (final item in items) ...[
+        Text(
+          '${garmentByKey(item.garmentKey)?.label(isAm) ?? item.garmentKey}'
+          '${item.quantity > 1 ? '  x${item.quantity}' : ''}',
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 4),
+        for (final (label, value) in garmentValuePairs(
+            garmentByKey(item.garmentKey) ?? allGarments.first,
+            item.measurement,
+            isAm))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(label, style: Theme.of(context).textTheme.bodySmall),
+                Text(value,
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
+              ],
+            ),
+          ),
+        if (garmentValuePairs(
+                garmentByKey(item.garmentKey) ?? allGarments.first,
+                item.style,
+                isAm)
+            .isNotEmpty) ...[
+          const SizedBox(height: 4),
+          for (final (label, value) in garmentValuePairs(
+              garmentByKey(item.garmentKey) ?? allGarments.first,
+              item.style,
+              isAm))
+            Padding(
+              padding: const EdgeInsets.only(bottom: 2),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(label, style: Theme.of(context).textTheme.bodySmall),
+                  Text(value,
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                ],
+              ),
+            ),
+        ],
+        const SizedBox(height: 16),
+      ],
+    ];
+  }
+
+  List<Widget> _historyTiles(BuildContext context,
+      List<StatusHistoryEntry> history, bool isAm, AppLocalizations l10n) {
+    final entries = [...history]
+      ..sort((a, b) => b.changedAt.compareTo(a.changedAt));
+    if (entries.isEmpty) {
+      return [Text(l10n.noResults)];
+    }
+    return [
+      for (final entry in entries)
+        ListTile(
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+          leading: Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: statusColors(entry.status).$1,
+              shape: BoxShape.circle,
+            ),
+          ),
+          title: Text(statusLabel(context, entry.status)),
+          subtitle: Text(
+            '${displayDate(context, entry.changedAt)} '
+            '${displayTime(context, entry.changedAt)}'
+            '${entry.note.isEmpty ? '' : ' - ${entry.note}'}',
+          ),
+        ),
+    ];
   }
 
   /// Design reference photos grouped by garment design type, with the

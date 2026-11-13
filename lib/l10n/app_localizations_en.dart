@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'ZIZI FASHION';
+  String get appTitle => 'ZIZU FASHION';
 
   @override
   String get tabHome => 'Home';
@@ -389,7 +389,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tagline => 'Tailor Management System';
 
   @override
-  String get thankYou => 'Thank you for choosing ZIZI FASHION';
+  String get thankYou => 'Thank you for choosing ZIZU FASHION';
 
   @override
   String get goHome => 'Go to Home';
@@ -401,7 +401,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentOrders => 'Recent orders';
 
   @override
+  String get tabReports => 'Reports';
+
+  @override
+  String get tabMore => 'More';
+
+  @override
+  String get statInProgress => 'In progress';
+
+  @override
+  String get viewCustomer => 'View customer';
+
+  @override
+  String get stepCategory => 'Category';
+
+  @override
+  String get viewOrder => 'View order';
+
+  @override
+  String get designViewType => 'Photo type';
+
+  @override
+  String get viewFront => 'Front view';
+
+  @override
+  String get viewBack => 'Back view';
+
+  @override
+  String get viewSide => 'Side view';
+
+  @override
+  String get viewFabric => 'Fabric sample';
+
+  @override
+  String get viewDetail => 'Detail reference';
+
+  @override
+  String get viewInspiration => 'Inspiration';
+
+  @override
   String get registered => 'Registered';
+
+  @override
+  String welcome(String name) {
+    return 'Welcome, $name';
+  }
 
   @override
   String get fieldGender => 'Gender';

@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'ZIZI FASHION'**
+  /// **'ZIZU FASHION'**
   String get appTitle;
 
   /// No description provided for @tabHome.
@@ -851,7 +851,7 @@ abstract class AppLocalizations {
   /// No description provided for @thankYou.
   ///
   /// In en, this message translates to:
-  /// **'Thank you for choosing ZIZI FASHION'**
+  /// **'Thank you for choosing ZIZU FASHION'**
   String get thankYou;
 
   /// No description provided for @goHome.
@@ -872,11 +872,95 @@ abstract class AppLocalizations {
   /// **'Recent orders'**
   String get recentOrders;
 
+  /// No description provided for @tabReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get tabReports;
+
+  /// No description provided for @tabMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get tabMore;
+
+  /// No description provided for @statInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get statInProgress;
+
+  /// No description provided for @viewCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'View customer'**
+  String get viewCustomer;
+
+  /// No description provided for @stepCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get stepCategory;
+
+  /// No description provided for @viewOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'View order'**
+  String get viewOrder;
+
+  /// No description provided for @designViewType.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo type'**
+  String get designViewType;
+
+  /// No description provided for @viewFront.
+  ///
+  /// In en, this message translates to:
+  /// **'Front view'**
+  String get viewFront;
+
+  /// No description provided for @viewBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back view'**
+  String get viewBack;
+
+  /// No description provided for @viewSide.
+  ///
+  /// In en, this message translates to:
+  /// **'Side view'**
+  String get viewSide;
+
+  /// No description provided for @viewFabric.
+  ///
+  /// In en, this message translates to:
+  /// **'Fabric sample'**
+  String get viewFabric;
+
+  /// No description provided for @viewDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Detail reference'**
+  String get viewDetail;
+
+  /// No description provided for @viewInspiration.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspiration'**
+  String get viewInspiration;
+
   /// No description provided for @registered.
   ///
   /// In en, this message translates to:
   /// **'Registered'**
   String get registered;
+
+  /// No description provided for @welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, {name}'**
+  String welcome(String name);
 
   /// No description provided for @fieldGender.
   ///
