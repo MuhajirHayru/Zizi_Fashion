@@ -95,8 +95,12 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
       _gender = prefill.gender;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final no = await context.read<ShopProvider>().nextOrderNumber();
-      if (mounted) setState(() => _orderNoPreview = no);
+      try {
+        final no = await context.read<ShopProvider>().nextOrderNumber();
+        if (mounted) setState(() => _orderNoPreview = no);
+      } catch (_) {
+        // Environments without the database plugin (e.g. widget tests).
+      }
     });
   }
 
@@ -1239,25 +1243,26 @@ class _NewOrderWizardState extends State<NewOrderWizard> {
 
   // ---------- build ----------
 
+  Widget _buildStep(int step) => switch (step) {
+        0 => _customerStep(),
+        1 => _clothingStep(),
+        2 => _measurementsStep(),
+        3 => _designStep(),
+        4 => _fabricStep(),
+        5 => _detailsStep(),
+        _ => _reviewStep(),
+      };
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final pages = [
-      _customerStep(),
-      _clothingStep(),
-      _measurementsStep(),
-      _designStep(),
-      _fabricStep(),
-      _detailsStep(),
-      _reviewStep(),
-    ];
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.newOrder)),
       body: Column(
         children: [
           _stepHeader(l10n),
-          Expanded(child: pages[_step]),
+          Expanded(child: _buildStep(_step)),
           Container(
             color: Colors.white,
             padding: EdgeInsets.only(

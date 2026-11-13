@@ -76,7 +76,9 @@ class GarmentMeasurementForm extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: DropdownButtonFormField<String>(
-                initialValue: values[field.key]!.isEmpty ? null : values[field.key],
+                initialValue: (values[field.key] ?? '').isEmpty
+                    ? null
+                    : values[field.key],
                 decoration: InputDecoration(
                   labelText: field.label(isAm),
                   border: const OutlineInputBorder(),
