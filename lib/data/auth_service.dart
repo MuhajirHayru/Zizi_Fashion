@@ -15,6 +15,7 @@ class AuthService extends ChangeNotifier {
   static const _kSalt = 'auth_password_salt';
 
   bool _enabled = false;
+  bool loaded = false;
   String? _username;
   String? _hash;
   String? _salt;
@@ -36,6 +37,7 @@ class AuthService extends ChangeNotifier {
     _username = prefs.getString(_kUsername);
     _hash = prefs.getString(_kHash);
     _salt = prefs.getString(_kSalt);
+    loaded = true;
     notifyListeners();
   }
 

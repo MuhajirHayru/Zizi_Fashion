@@ -36,21 +36,44 @@ class LocalDb {
   /// to the new location so no existing data
   /// (customers, orders, measurements, payments) is lost.
   Future<void> _migrateLegacyDatabase(String newPath) async {
-    if (await File(newPath).exists()) return;
-    final candidates = <String>[
-      p.join(await getDatabasesPath(), 'tailor_shop.db'),
-      ...await AppStorage.legacyDatabasePaths(),
-    ];
+    // Pick the NEWEST database across the permanent folder, the old
+    // public folder and private storage, so no data is lost or rolled
+    // back by an update.
+    final candidates = <File>[File(newPath)];
+    try {
+      for (final path in await AppStorage.legacyDatabasePaths()) {
+        candidates.add(File(path));
+      }
+    } catch (_) {}
+    File? newest;
+    DateTime newestTime = DateTime.fromMillisecondsSinceEpoch(0);
     for (final candidate in candidates) {
       try {
-        final legacy = File(candidate);
-        if (await legacy.exists()) {
-          await legacy.copy(newPath);
-          return;
+        if (await candidate.exists()) {
+          final modified = await candidate.lastModified();
+          if (modified.isAfter(newestTime)) {
+            newestTime = modified;
+            newest = candidate;
+          }
         }
+      } catch (_) {}
+    }
+    try {
+      final legacyTailor =
+          File(p.join(await getDatabasesPath(), 'tailor_shop.db'));
+      if (await legacyTailor.exists()) {
+        final modified = await legacyTailor.lastModified();
+        if (modified.isAfter(newestTime)) {
+          newestTime = modified;
+          newest = legacyTailor;
+        }
+      }
+    } catch (_) {}
+    if (newest != null && newest.path != newPath) {
+      try {
+        await newest.copy(newPath);
       } catch (_) {
-        // Try the next candidate; openDatabase creates a fresh file
-        // if none can be copied.
+        // openDatabase creates a fresh file if the copy fails.
       }
     }
   }

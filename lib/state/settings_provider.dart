@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SettingsProvider extends ChangeNotifier {
   SettingsProvider({this.locale = const Locale('en')});
 
+  bool loaded = false;
+
   Locale locale;
 
   SharedPreferences? _prefs;
@@ -17,6 +19,8 @@ class SettingsProvider extends ChangeNotifier {
       locale = Locale(code);
       notifyListeners();
     }
+    loaded = true;
+    notifyListeners();
   }
 
   Future<void> setLocale(Locale value) async {

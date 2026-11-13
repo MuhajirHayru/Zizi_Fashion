@@ -28,6 +28,7 @@ class ShopProvider extends ChangeNotifier {
   List<FabricSample> fabricSamples = [];
   List<OrderDesignImage> designImages = [];
   String? activeStaffId;
+  bool loaded = false;
 
   Future<void> loadAll() async {
     customers = (await _db.all('customers'))
@@ -79,6 +80,7 @@ class ShopProvider extends ChangeNotifier {
       await prefs.setString('active_staff_id', activeStaffId!);
     }
 
+    loaded = true;
     notifyListeners();
   }
 

@@ -76,12 +76,12 @@ class AppStorage {
   /// Previous storage locations whose database should be carried over to
   /// the permanent folder (private app storage and the old ZIZI_ folder).
   static Future<List<String>> legacyDatabasePaths() async {
-    final paths = <String>[];
-    try {
-      final docs = await getApplicationDocumentsDirectory();
-      paths.add(p.join(docs.path, 'zizi_fashion.db'));
-    } catch (_) {}
-    paths.add('/storage/emulated/0/ZIZI_FASHION/zizi_fashion.db');
-    return paths;
+    // The public ZIZI_ folder holds the tester's newest data - check it
+    // before the older private copy.
+    return [
+      '/storage/emulated/0/ZIZI_FASHION/zizi_fashion.db',
+      p.join((await getApplicationDocumentsDirectory()).path,
+          'zizi_fashion.db'),
+    ];
   }
 }
