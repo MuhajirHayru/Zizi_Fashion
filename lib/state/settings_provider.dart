@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+/// App settings that persist on the phone. Currently just the UI language.
+class SettingsProvider extends ChangeNotifier {
+  SettingsProvider({this.locale = const Locale('en')});
+
+  Locale locale;
+
+  SharedPreferences? _prefs;
+
+  Future<void> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    _prefs = prefs;
+    final code = prefs.getString('locale');
+    if (code != null && (code == 'en' || code == 'am')) {
+      locale = Locale(code);
+      notifyListeners();
+    }
+  }
+
+  Future<void> setLocale(Locale value) async {
+    locale = value;
+    notifyListeners();
+    await _prefs?.setString('locale', value.languageCode);
+  }
+}

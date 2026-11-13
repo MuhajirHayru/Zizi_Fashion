@@ -1,0 +1,11 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+  errors:
+    # material.dart is kept on purpose: it works on every Flutter version,
+    # while the suggested material_ui package only exists in the newest ones.
+    deprecated_member_use: ignore
