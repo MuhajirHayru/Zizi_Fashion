@@ -1,7 +1,7 @@
 name: tailor_shop
 description: ZIZI FASHION - offline tailor shop management with graduation wear measurements, Ethiopian calendar support. English + Amharic.
 publish_to: "none"
-version: 4.0.2+10
+version: 4.0.3+11
 
 environment:
   # Dart 3.0 = Flutter 3.10; keeps compatibility with older installed SDKs too.

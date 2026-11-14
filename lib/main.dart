@@ -79,7 +79,10 @@ class AppRoot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ready = settings.loaded && auth.loaded && shop.loaded;
+    // Watch (not just read) so this widget rebuilds when loading finishes.
+    final ready = context.watch<SettingsProvider>().loaded &&
+        context.watch<AuthService>().loaded &&
+        context.watch<ShopProvider>().loaded;
     if (!ready) {
       return const MaterialApp(
         debugShowCheckedModeBanner: false,
